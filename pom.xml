@@ -37,9 +37,9 @@
     </description>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/sling/trunk/bundles/extensions/dea</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/sling/trunk/bundles/extensions/dea</developerConnection>
-        <url>http://svn.apache.org/viewvc/sling/trunk/bundles/extensions/dea</url>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-event-dea.git</conncetion>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-event-dea.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-event-dea.git</url>
     </scm>
 
     <build>
