@@ -249,6 +249,7 @@ public class DistributedEventReceiver
             properties.put("event.dea." + ResourceResolver.PROPERTY_RESOURCE_TYPE, oldRT);
         }
         properties.put(ResourceResolver.PROPERTY_RESOURCE_TYPE, DistributedEventAdminImpl.RESOURCE_TYPE_EVENT);
+        this.writerResolver.refresh();
         ResourceUtil.getOrCreateResource(this.writerResolver,
                 sb.toString(),
                 properties,
