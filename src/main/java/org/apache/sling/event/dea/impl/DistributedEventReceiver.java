@@ -87,7 +87,7 @@ public class DistributedEventReceiver
     /** The cleanup period. */
     private final int cleanupPeriod;
 
-    /** Resolver used for writing. */
+    /** Resolver used for writing; needs to be refreshed before used */
     private volatile ResourceResolver writerResolver;
 
     /** Is the background task still running? */
@@ -126,6 +126,7 @@ public class DistributedEventReceiver
                 // schedule this service every 30 minutes
                 props.put("scheduler.period", 1800L);
                 props.put("scheduler.concurrent", Boolean.FALSE);
+                props.put("scheduler.threadpool", "org-apache-sling-event-dea");
 
                 final ServiceRegistration<?> reg =
                         bundleContext.registerService(new String[] {EventHandler.class.getName(),
@@ -135,6 +136,10 @@ public class DistributedEventReceiver
 
                 DistributedEventReceiver.this.serviceRegistration = reg;
 
+                /**
+                 * The writerResolver is a long running resource resolver, which is refreshed before it is used.
+                 * We also cannot use try-with-resource here, because writerResolver needs to be global due to this.
+                 */
                 try {
                     writerResolver = resourceResolverFactory.getServiceResourceResolver(null);
                     ResourceUtil.getOrCreateResource(writerResolver,
@@ -148,7 +153,7 @@ public class DistributedEventReceiver
                     running = false;
                 }
                 try {
-                    processWriteQueue();
+                    processWriteQueue(); // this will block until stop() is invoked
                 } catch (final Throwable t) { //NOSONAR
                     logger.error("Writer thread stopped with exception: " + t.getMessage(), t);
                     running = false;
