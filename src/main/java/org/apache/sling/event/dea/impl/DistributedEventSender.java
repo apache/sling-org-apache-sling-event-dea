@@ -71,6 +71,8 @@ public class DistributedEventSender
     private final String ownRootPathWithSlash;
 
     private volatile ServiceRegistration<ResourceChangeListener> serviceRegistration;
+    
+    private volatile int postedEventCounter = 0;
 
     public DistributedEventSender(final BundleContext bundleContext,
             final String rootPath,
@@ -202,6 +204,7 @@ public class DistributedEventSender
                             final EventAdmin localEA = this.eventAdmin;
                             if ( localEA != null ) {
                                 localEA.postEvent(e);
+                                postedEventCounter++;
                             } else {
                                 this.logger.error("Unable to post event as no event admin is available.");
                             }
@@ -244,4 +247,13 @@ public class DistributedEventSender
             this.logger.debug("Ignored exception " + e.getMessage(), e);
         }
     }
+    
+    /**
+     * Return the number of events which have been posted to the local eventAdmin
+     * @return number of events
+     */
+    public int getPostedEventCounter() {
+        return postedEventCounter;
+    }
+    
 }

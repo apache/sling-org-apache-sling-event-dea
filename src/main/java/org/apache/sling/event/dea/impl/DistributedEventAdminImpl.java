@@ -21,12 +21,17 @@ package org.apache.sling.event.dea.impl;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.serviceusermapping.ServiceUserMapped;
 import org.apache.sling.settings.SlingSettingsService;
+import org.apache.sling.commons.metrics.Gauge;
+import org.apache.sling.commons.metrics.MetricsService;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.event.EventAdmin;
+
+
 
 /**
  * This service wraps the configuration of the distributed event admin
@@ -59,6 +64,9 @@ public class DistributedEventAdminImpl {
     @Reference
     private ServiceUserMapped serviceUserMapped;
 
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    MetricsService metrics;
+    
     /** Default repository path. */
     public static final String DEFAULT_REPOSITORY_PATH = "/var/eventing/distribution";
 
@@ -84,6 +92,15 @@ public class DistributedEventAdminImpl {
                               props.repository_path(),
                               ownRootPath,
                               this.resourceResolverFactory, this.eventAdmin);
+        
+        if (metrics != null) {
+            // It's easier to use a gauge here instead of passing the (optional) MetricsRegistry into 
+            // each of these 2 services, so they can register counters themselves.
+            metrics.gauge("org.apache.sling.event.dea.receiver.successCounter", receiver::getSuccessCounter);
+            metrics.gauge("org.apache.sling.event.dea.receiver.failureCounter", receiver::getFailureCounter);
+            metrics.gauge("org.apache.sling.event.dea.sender.postedEventsCounter", sender::getPostedEventCounter);
+        }
+        
     }
 
     @Deactivate

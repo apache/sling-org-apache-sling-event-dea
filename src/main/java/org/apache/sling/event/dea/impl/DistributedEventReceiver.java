@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.sling.api.resource.LoginException;
@@ -98,6 +99,10 @@ public class DistributedEventReceiver
 
     /** The service registration. */
     private volatile ServiceRegistration<?> serviceRegistration;
+    
+    // counters can be simple ints, as there's only 1 thread
+    private volatile int successCounter = 0;
+    private volatile int failureCounter = 0;
 
     public DistributedEventReceiver(final BundleContext bundleContext,
             final String rootPath,
@@ -202,8 +207,10 @@ public class DistributedEventReceiver
             if ( event != null && this.running ) {
                 try {
                     this.writeEvent(event);
+                    successCounter++;
                 } catch (final Exception e) {
                     this.logger.error("Exception during writing the event to the resource tree.", e);
+                    failureCounter++;
                 }
             }
         }
@@ -439,6 +446,15 @@ public class DistributedEventReceiver
                 this.instances = set;
             }
         }
+    }
+    
+    
+    public int getSuccessCounter() {
+        return successCounter;
+    }
+    
+    public int getFailureCounter() {
+        return failureCounter;
     }
 }
 
