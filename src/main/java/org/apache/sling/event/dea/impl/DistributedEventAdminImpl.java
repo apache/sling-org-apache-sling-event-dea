@@ -21,7 +21,6 @@ package org.apache.sling.event.dea.impl;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.serviceusermapping.ServiceUserMapped;
 import org.apache.sling.settings.SlingSettingsService;
-import org.apache.sling.commons.metrics.Gauge;
 import org.apache.sling.commons.metrics.MetricsService;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;

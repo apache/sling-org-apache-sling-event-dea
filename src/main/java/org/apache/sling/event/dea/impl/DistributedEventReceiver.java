@@ -100,9 +100,9 @@ public class DistributedEventReceiver
     /** The service registration. */
     private volatile ServiceRegistration<?> serviceRegistration;
     
-    // counters can be simple ints, as there's only 1 thread
-    private volatile int successCounter = 0;
-    private volatile int failureCounter = 0;
+    // Counters
+    private AtomicInteger successCounter = new AtomicInteger();
+    private AtomicInteger failureCounter = new AtomicInteger();
 
     public DistributedEventReceiver(final BundleContext bundleContext,
             final String rootPath,
@@ -207,10 +207,10 @@ public class DistributedEventReceiver
             if ( event != null && this.running ) {
                 try {
                     this.writeEvent(event);
-                    successCounter++;
+                    successCounter.incrementAndGet();
                 } catch (final Exception e) {
                     this.logger.error("Exception during writing the event to the resource tree.", e);
-                    failureCounter++;
+                    failureCounter.incrementAndGet();
                 }
             }
         }
@@ -450,11 +450,11 @@ public class DistributedEventReceiver
     
     
     public int getSuccessCounter() {
-        return successCounter;
+        return successCounter.get();
     }
     
     public int getFailureCounter() {
-        return failureCounter;
+        return failureCounter.get();
     }
 }
 
