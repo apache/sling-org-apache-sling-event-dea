@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.sling.api.resource.LoginException;
 import org.apache.sling.api.resource.Resource;
@@ -71,6 +72,8 @@ public class DistributedEventSender
     private final String ownRootPathWithSlash;
 
     private volatile ServiceRegistration<ResourceChangeListener> serviceRegistration;
+    
+    private AtomicInteger postedEventCounter = new AtomicInteger();
 
     public DistributedEventSender(final BundleContext bundleContext,
             final String rootPath,
@@ -202,6 +205,7 @@ public class DistributedEventSender
                             final EventAdmin localEA = this.eventAdmin;
                             if ( localEA != null ) {
                                 localEA.postEvent(e);
+                                postedEventCounter.incrementAndGet();
                             } else {
                                 this.logger.error("Unable to post event as no event admin is available.");
                             }
@@ -244,4 +248,13 @@ public class DistributedEventSender
             this.logger.debug("Ignored exception " + e.getMessage(), e);
         }
     }
+    
+    /**
+     * Return the number of events which have been posted to the local eventAdmin
+     * @return number of events
+     */
+    public int getPostedEventCounter() {
+        return postedEventCounter.get();
+    }
+    
 }
